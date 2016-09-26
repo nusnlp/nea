@@ -41,4 +41,4 @@ Neural Essay Assessor is licensed under the GNU General Public License Version 3
 
 ### Publication ###
 
-Kaveh Taghipour and Hwee Tou Ng. 2016. A neural approach to automated essay scoring. In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing.
+Kaveh Taghipour and Hwee Tou Ng. 2016. [A neural approach to automated essay scoring](http://www.comp.nus.edu.sg/~kaveh/papers/aesnn-emnlp16.pdf). In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing.
