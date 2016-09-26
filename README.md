@@ -25,3 +25,9 @@ THEANO_FLAGS="device=gpu0,floatX=float32" ~/git/nea-released/train_nea.py
 	-o output_dir
 ```
 
+### License ###
+
+Neural Essay Assessor is licensed under the GNU General Public License Version 3. Separate commercial licensing is also available. For more information contact:
+
+* Kaveh Taghipour (kaveh@comp.nus.edu.sg)
+* Hwee Tou Ng (nght@comp.nus.edu.sg)
