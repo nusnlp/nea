@@ -23,7 +23,7 @@ python train_nea.py -h
 The following command trains a model for prompt 1 in the ASAP dataset, using the training and development data from fold 0 and evaluates it.
 
 ```bash
-THEANO_FLAGS="device=gpu0,floatX=float32" ~/git/nea-released/train_nea.py
+THEANO_FLAGS="device=gpu0,floatX=float32" train_nea.py
 	-tr fold_0/train.tsv
 	-tu fold_0/dev.tsv
 	-ts fold_0/test.tsv
