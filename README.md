@@ -37,6 +37,10 @@ THEANO_FLAGS="device=gpu0,floatX=float32" python train_nea.py
 	-o output_dir
 ```
 
+### Frequently Asked Questions ###
+
+See our [FAQ](https://github.com/nusnlp/nea/blob/master/FAQ.md) page for a list of frequently asked questions. If the answer to your question is not there, contact me (kaveh@comp.nus.edu.sg).
+
 ### License ###
 
 Neural Essay Assessor is licensed under the GNU General Public License Version 3. Separate commercial licensing is also available. For more information contact:
