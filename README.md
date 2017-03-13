@@ -10,7 +10,12 @@ An automatic essay scoring system based on convolutional and recurrent neural ne
 
 ### Data ###
 
-We have used 5-fold cross validation on ASAP dataset to evaluate our system. This dataset (training_set_rel3.tsv) can be downloaded from [here](https://www.kaggle.com/c/asap-aes/data). After downloading the dataset, create training, development and test data according to the essay IDs in the [data directory](https://github.com/nusnlp/nea/tree/master/data). You should keep the TSV header in all the generated files.
+We have used 5-fold cross validation on ASAP dataset to evaluate our system. This dataset (training_set_rel3.tsv) can be downloaded from [here](https://www.kaggle.com/c/asap-aes/data). After downloading the file, put it in the [data](https://github.com/nusnlp/nea/tree/master/data) directory and create training, development and test data using ```preprocess_asap.py``` script:
+
+```bash
+cd data
+python preprocess_asap.py -i training_set_rel3.tsv
+```
 
 ### Options ###
 
@@ -23,10 +28,10 @@ python train_nea.py -h
 The following command trains a model for prompt 1 in the ASAP dataset, using the training and development data from fold 0 and evaluates it.
 
 ```bash
-THEANO_FLAGS="device=gpu0,floatX=float32" train_nea.py
-	-tr fold_0/train.tsv
-	-tu fold_0/dev.tsv
-	-ts fold_0/test.tsv
+THEANO_FLAGS="device=gpu0,floatX=float32" python train_nea.py
+	-tr data/fold_0/train.tsv
+	-tu data/fold_0/dev.tsv
+	-ts data/fold_0/test.tsv
 	-p 1	# Prompt ID
 	--emb embeddings.w2v.txt
 	-o output_dir
