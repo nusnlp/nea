@@ -4,7 +4,7 @@ An automatic essay scoring system based on convolutional and recurrent neural ne
 
 ### Set Up ###
 
-* Install Keras
+* Install Keras (with Theano backend)
 * Prepare data
 * Run train_nea.py
 
