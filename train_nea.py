@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import argparse
 import logging
 import numpy as np
@@ -9,6 +10,8 @@ import sys
 import nea.utils as U
 import pickle as pk
 
+
+os.environ['KERAS_BACKEND']='theano'
 logger = logging.getLogger(__name__)
 
 ###############################################################################################################################
@@ -164,9 +167,9 @@ model.compile(loss=loss, optimizer=optimizer, metrics=[metric])
 ## Plotting model
 #
 
-from keras.utils.visualize_util import plot
+#from keras.utils.visualize_util import plot
 
-plot(model, to_file = out_dir + '/model.png')
+#plot(model, to_file = out_dir + '/model.png')
 
 ###############################################################################################################################
 ## Save model architecture
@@ -189,14 +192,16 @@ evl = Evaluator(dataset, args.prompt_id, out_dir, dev_x, test_x, dev_y, test_y, 
 
 logger.info('--------------------------------------------------------------------------------------------------------------------------')
 logger.info('Initial Evaluation:')
-evl.evaluate(model, -1, print_info=True)
+#evl.evaluate(model, -1, print_info=True)
 
 total_train_time = 0
 total_eval_time = 0
 
+
 for ii in range(args.epochs):
 	# Training
 	t0 = time()
+
 	train_history = model.fit(train_x, train_y, batch_size=args.batch_size, nb_epoch=1, verbose=0)
 	tr_time = time() - t0
 	total_train_time += tr_time
