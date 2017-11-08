@@ -49,7 +49,7 @@ def create_model(args, initial_mean_value, overal_maxlen, vocab):
 		model.add(Dense(num_outputs))
 		if not args.skip_init_bias:
 			bias_value = (np.log(initial_mean_value) - np.log(1 - initial_mean_value)).astype(K.floatx())
-			model.layers[-1].b.set_value(bias_value)
+			model.layers[-1].bias = bias_value
 		model.add(Activation('sigmoid'))
 		model.emb_index = 0
 	
