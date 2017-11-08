@@ -130,7 +130,6 @@ def create_model(args, initial_mean_value, overal_maxlen, vocab):
 		from w2vEmbReader import W2VEmbReader as EmbReader
 		logger.info('Initializing lookup table')
 		emb_reader = EmbReader(args.emb_path, emb_dim=args.emb_dim)
-		# modified by Shengjia Yan @2017-11-06 Monday
 		model.layers[model.emb_index].set_weights(emb_reader.get_emb_matrix_given_vocab(vocab, model.layers[model.emb_index].get_weights()))
 		logger.info('  Done')
 	

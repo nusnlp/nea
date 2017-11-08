@@ -3,7 +3,6 @@ from keras.engine.topology import Layer
 from keras.layers.convolutional import Convolution1D
 import numpy as np
 import sys
-# import tensorflow as tf
 
 class Attention(Layer):
 	def __init__(self, op='attsum', activation='tanh', init_stdev=0.01, **kwargs):
@@ -76,6 +75,5 @@ class Conv1DWithMasking(Convolution1D):
 		self.supports_masking = True
 		super(Conv1DWithMasking, self).__init__(**kwargs)
 
-	
 	def compute_mask(self, x, mask):
 		return mask
