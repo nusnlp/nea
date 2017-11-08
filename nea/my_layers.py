@@ -1,3 +1,9 @@
+# !/usr/bin/python
+# -*- coding:utf-8 -*-  
+# Author: Shengjia Yan
+# Date: 2017-10-19
+# Email: i@yanshengjia.com
+
 import keras.backend as K
 from keras.engine.topology import Layer
 from keras.layers.convolutional import Convolution1D
@@ -54,12 +60,11 @@ class MeanOverTime(Layer):
 
 	def call(self, x, mask=None):
 		if self.mask_zero:
-			mask = K.cast(mask, K.floatx())
-			return K.cast(K.sum(x, axis=1) / K.sum(mask, axis=1, keepdims= True), K.floatx())
+			return K.cast(x.sum(axis=1) / mask.sum(axis=1, keepdims=True), K.floatx())
 		else:
 			return K.mean(x, axis=1)
 
-	def compute_output_shape(self, input_shape):
+	def get_output_shape_for(self, input_shape):
 		return (input_shape[0], input_shape[2])
 	
 	def compute_mask(self, x, mask):
@@ -74,7 +79,6 @@ class Conv1DWithMasking(Convolution1D):
 	def __init__(self, **kwargs):
 		self.supports_masking = True
 		super(Conv1DWithMasking, self).__init__(**kwargs)
-
 	
 	def compute_mask(self, x, mask):
 		return mask

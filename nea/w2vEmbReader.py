@@ -1,3 +1,9 @@
+# !/usr/bin/python
+# -*- coding:utf-8 -*-  
+# Author: Shengjia Yan
+# Date: 2017-10-19
+# Email: i@yanshengjia.com
+
 import codecs
 import logging
 import numpy as np
@@ -28,10 +34,12 @@ class W2VEmbReader:
 				counter = 0
 				for line in emb_file:
 					tokens = line.split()
-					# modified by Shengjia Yan @2017-11-03 Friday
+					# modified by sjyan @2017-10-19
+					# deal with comma
 					word = tokens[0]
-					vec = tokens[1].split(',')
-					assert len(vec) == self.emb_dim, 'The number of dimensions does not match the header info'
+					str = tokens[1]
+					vec = str.split(',')
+					assert len(vec) == self.emb_dim, 'The number of dimensions does not match the header info'	
 					self.embeddings[word] = vec
 					counter += 1
 				assert counter == self.vocab_size, 'Vocab size does not match the header info'
@@ -42,14 +50,18 @@ class W2VEmbReader:
 				self.embeddings = {}
 				for line in emb_file:
 					tokens = line.split()
+					# modified by sjyan @2017-10-19
+					# deal with comma
 					word = tokens[0]
-					vec = tokens[1].split(',')
+					str = tokens[1]
+					vec = str.split(',')
+
 					if self.emb_dim == -1:
 						self.emb_dim = len(vec)
 						assert self.emb_dim == emb_dim, 'The embeddings dimension does not match with the requested dimension'
 					else:
 						assert len(vec) == self.emb_dim, 'The number of dimensions does not match the header info'
-
+					
 					self.embeddings[word] = vec
 					self.vocab_size += 1
 		
@@ -65,7 +77,7 @@ class W2VEmbReader:
 		counter = 0.
 		for word, index in vocab.iteritems():
 			try:
-				emb_matrix[0][index] = self.embeddings[word]
+				emb_matrix[index] = self.embeddings[word]
 				counter += 1
 			except KeyError:
 				pass
