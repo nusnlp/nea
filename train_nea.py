@@ -167,9 +167,9 @@ model.compile(loss=loss, optimizer=optimizer, metrics=[metric])
 ## Plotting model
 #
 
-from keras.utils.visualize_util import plot
+from keras.utils.vis_utils import plot_model
 
-plot(model, to_file = out_dir + '/model.png')
+plot_model(model, to_file = out_dir + '/model.png')
 
 ###############################################################################################################################
 ## Save model architecture
