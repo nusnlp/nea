@@ -39,101 +39,10 @@ class Evaluator():
 		self.best_test_missed_epoch = -1
 		self.batch_size = 180
 		self.low, self.high = self.dataset.get_score_range(self.prompt_id)
-		self.dump_ref_scores()
-		self.generate_contrast_result(self.best_dev_epoch)
-	
-	def dump_ref_scores(self):
-		logger.info('Saving reference scores')
-		np.savetxt(self.out_dir + '/preds/train_ref.txt', self.train_y_org, fmt='%i')
-		np.savetxt(self.out_dir + '/preds/dev_ref.txt', self.dev_y_org, fmt='%i')
-		np.savetxt(self.out_dir + '/preds/test_ref.txt', self.test_y_org, fmt='%i')
-		logger.info('  Done')
 	
 	def dump_predictions(self, dev_pred, test_pred, epoch):
 		np.savetxt(self.out_dir + '/preds/dev_pred_' + str(epoch) + '.txt', dev_pred, fmt='%.8f')
 		np.savetxt(self.out_dir + '/preds/test_pred_' + str(epoch) + '.txt', test_pred, fmt='%.8f')
-
-	# modified by sjyan @2017-10-26
-	def plot_confusion_matrix(self, cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
-		"""
-		This function prints and plots the confusion matrix.
-		Normalization can be applied by setting `normalize=True`.
-		"""
-		if normalize:
-			# find out how many samples per class have received their correct label
-			cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
-        	# get the precision (fraction of class-k predictions that have ground truth label k)
-			# cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-			print("Normalized confusion matrix")
-		else:
-			print('Confusion matrix, without normalization')
-
-		print(cm)
-
-		plt.imshow(cm, interpolation='nearest', cmap=cmap)
-		plt.title(title)
-		plt.colorbar()
-		tick_marks = np.arange(len(classes))
-		plt.xticks(tick_marks, classes, rotation=45)
-		plt.yticks(tick_marks, classes)
-
-		fmt = '.2f' if normalize else 'd'
-		thresh = cm.max() / 2.
-		for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-			plt.text(j, i, format(cm[i, j], fmt),
-					horizontalalignment="center",
-					color="white" if cm[i, j] > thresh else "black")
-
-		plt.tight_layout()
-		plt.ylabel('True label')
-		plt.xlabel('Predicted label')
-
-	# modified by sjyan @2017-10-24
-	def generate_contrast_result(self, best_dev_epoch):
-		logger.info('Generating contrast result')
-		dev_ref_contrast_path = self.out_dir + '/preds/dev_ref_contrast.txt'
-		test_ref_contrast_path = self.out_dir + '/preds/test_ref_contrast.txt'
-
-		essays = []
-		ref_score = []		# true label
-		pred_score = []		# prediction label
-		diff_1_counter = 0
-		diff_2_counter = 0
-
-		essays_file = open(self.out_dir + '/preds/dev_essays.txt', 'r')
-		ref_file = open(self.out_dir + '/preds/dev_ref.txt', 'r')
-		pred_file = open(self.out_dir + '/preds/dev_pred_49.txt', 'r')
-		contrast_result_file = open(dev_ref_contrast_path, 'a')
-		contrast_result_file.seek(0)
-		contrast_result_file.truncate()
-		contrast_result_file.write('ref_score(2-12)  pred_score  essay\n')
-
-		for essay in essays_file.readlines():
-			essay = essay.strip('\n')
-			essays.append(essay)
-		for ref in ref_file.readlines():
-			ref = ref.strip('\n')
-			ref_score.append(ref)
-		for pred in pred_file.readlines():
-			pred = pred.strip('\n')
-			pred_score.append(pred)
-		for i in range(len(essays)):
-			ref_t = float(ref_score[i])
-			pred_t = float(pred_score[i])
-			if abs(ref_t - pred_t) <= 2:
-				diff_2_counter += 1
-				if abs(ref_t - pred_t) <= 1:
-					diff_1_counter += 1
-			string = ref_score[i] + '  ' + pred_score[i] + '  ' + essays[i] + '\n'
-			contrast_result_file.write(string)
-		
-		essay_counter = len(essays)
-		contrast_result_file.write('\nTotal number of essays: %d\n' % essay_counter)
-		contrast_result_file.write('diff <= 1 : %d (%.2f%%)\n' % (diff_1_counter, 100 * diff_1_counter / essay_counter))
-		contrast_result_file.write('diff <= 2 : %d (%.2f%%)\n' % (diff_2_counter, 100 * diff_2_counter / essay_counter))
-		# contrast_result_file.write('Pearson: 0.824\n')		# TODO
-		logger.info('  Done')
 		
 	def calc_correl(self, dev_pred, test_pred):
 		dev_prs, _ = pearsonr(dev_pred, self.dev_y_org)
