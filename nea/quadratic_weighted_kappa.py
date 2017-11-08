@@ -1,8 +1,4 @@
-# !/usr/bin/python
-# -*- coding:utf-8 -*-  
-# Author: Shengjia Yan
-# Date: 2017-10-19
-# Email: i@yanshengjia.com
+#! /usr/bin/env python2.7
 
 import numpy as np
 

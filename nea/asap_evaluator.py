@@ -1,33 +1,20 @@
-# !/usr/bin/python
-# -*- coding:utf-8 -*-  
-# Author: Shengjia Yan
-# Date: 2017-10-19
-# Email: i@yanshengjia.com
-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 from scipy.stats import pearsonr, spearmanr, kendalltau
 import logging
 import numpy as np
-import itertools
-import matplotlib.pyplot as plt
 from nea.my_kappa_calculator import quadratic_weighted_kappa as qwk
 from nea.my_kappa_calculator import linear_weighted_kappa as lwk
-from sklearn.metrics import confusion_matrix
 
 logger = logging.getLogger(__name__)
 
 class Evaluator():
 	
-	def __init__(self, dataset, prompt_id, out_dir, dev_x, test_x, dev_y, test_y, train_y_org, dev_y_org, test_y_org):
+	def __init__(self, dataset, prompt_id, out_dir, dev_x, test_x, dev_y, test_y, dev_y_org, test_y_org):
 		self.dataset = dataset
 		self.prompt_id = prompt_id
 		self.out_dir = out_dir
 		self.dev_x, self.test_x = dev_x, test_x
-		self.dev_y, self.test_y = dev_y, test_y						# 标准化后的人工打分 [0, 1]
-		self.train_y_org, self.dev_y_org, self.test_y_org = train_y_org, dev_y_org, test_y_org		# 原始的人工打分
+		self.dev_y, self.test_y = dev_y, test_y
+		self.dev_y_org, self.test_y_org = dev_y_org, test_y_org
 		self.dev_mean = self.dev_y_org.mean()
 		self.test_mean = self.test_y_org.mean()
 		self.dev_std = self.dev_y_org.std()
@@ -39,11 +26,16 @@ class Evaluator():
 		self.best_test_missed_epoch = -1
 		self.batch_size = 180
 		self.low, self.high = self.dataset.get_score_range(self.prompt_id)
+		self.dump_ref_scores()
+	
+	def dump_ref_scores(self):
+		np.savetxt(self.out_dir + '/preds/dev_ref.txt', self.dev_y_org, fmt='%i')
+		np.savetxt(self.out_dir + '/preds/test_ref.txt', self.test_y_org, fmt='%i')
 	
 	def dump_predictions(self, dev_pred, test_pred, epoch):
 		np.savetxt(self.out_dir + '/preds/dev_pred_' + str(epoch) + '.txt', dev_pred, fmt='%.8f')
 		np.savetxt(self.out_dir + '/preds/test_pred_' + str(epoch) + '.txt', test_pred, fmt='%.8f')
-		
+	
 	def calc_correl(self, dev_pred, test_pred):
 		dev_prs, _ = pearsonr(dev_pred, self.dev_y_org)
 		test_prs, _ = pearsonr(test_pred, self.test_y_org)
@@ -67,16 +59,14 @@ class Evaluator():
 		self.dev_loss, self.dev_metric = model.evaluate(self.dev_x, self.dev_y, batch_size=self.batch_size, verbose=0)
 		self.test_loss, self.test_metric = model.evaluate(self.test_x, self.test_y, batch_size=self.batch_size, verbose=0)
 		
-		# normalized score
 		self.dev_pred = model.predict(self.dev_x, batch_size=self.batch_size).squeeze()
 		self.test_pred = model.predict(self.test_x, batch_size=self.batch_size).squeeze()
 		
-		# unnormalized score
 		self.dev_pred = self.dataset.convert_to_dataset_friendly_scores(self.dev_pred, self.prompt_id)
 		self.test_pred = self.dataset.convert_to_dataset_friendly_scores(self.test_pred, self.prompt_id)
 		
 		self.dump_predictions(self.dev_pred, self.test_pred, epoch)
-
+		
 		self.dev_prs, self.test_prs, self.dev_spr, self.test_spr, self.dev_tau, self.test_tau = self.calc_correl(self.dev_pred, self.test_pred)
 		
 		self.dev_qwk, self.test_qwk, self.dev_lwk, self.test_lwk = self.calc_qwk(self.dev_pred, self.test_pred)

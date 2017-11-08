@@ -1,9 +1,3 @@
-# !/usr/bin/python
-# -*- coding:utf-8 -*-  
-# Author: Shengjia Yan
-# Date: 2017-10-19
-# Email: i@yanshengjia.com
-
 import random
 import codecs
 import sys
@@ -12,9 +6,6 @@ import logging
 import re
 import numpy as np
 import pickle as pk
-
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 logger = logging.getLogger(__name__)
 num_regex = re.compile('^[+-]?[0-9]+\.?[0-9]*$')
@@ -149,35 +140,22 @@ def read_essays(file_path, prompt_id):
 				essays_ids.append(int(tokens[0]))
 	return essays_list, essays_ids
 
-def read_dataset(file_path, output_path, prompt_id, maxlen, vocab, tokenize_text, to_lower, score_index=6, char_level=False):
+def read_dataset(file_path, prompt_id, maxlen, vocab, tokenize_text, to_lower, score_index=6, char_level=False):
 	logger.info('Reading dataset from: ' + file_path)
-
-	# modified by sjyan @2017-10-25
-	essays = []
-
-	if 'train' in file_path:
-		essays_path = output_path + '/preds/train_essays.txt'
-	if 'dev' in file_path:
-		essays_path = output_path + '/preds/dev_essays.txt'
-	if 'test' in file_path:
-		essays_path = output_path + '/preds/test_essays.txt'
-
 	if maxlen > 0:
 		logger.info('  Removing sequences with more than ' + str(maxlen) + ' words')
 	data_x, data_y, prompt_ids = [], [], []
 	num_hit, unk_hit, total = 0., 0., 0.
 	maxlen_x = -1
 	with codecs.open(file_path, mode='r', encoding='UTF8') as input_file:
-		input_file.next()	
+		input_file.next()
 		for line in input_file:
 			tokens = line.strip().split('\t')
 			essay_id = int(tokens[0])
 			essay_set = int(tokens[1])
-			content = tokens[2].strip()		# 作文内容
+			content = tokens[2].strip()
 			score = float(tokens[score_index])
-			if essay_set == prompt_id or prompt_id <= 0:	# 如果 作文所属集合编号 等于 命题集编号
-				# modified by sjyan @2017-10-25
-				essays.append(content)
+			if essay_set == prompt_id or prompt_id <= 0:
 				if to_lower:
 					content = content.lower()
 				if char_level:
@@ -210,17 +188,11 @@ def read_dataset(file_path, output_path, prompt_id, maxlen, vocab, tokenize_text
 				if maxlen_x < len(indices):
 					maxlen_x = len(indices)
 	logger.info('  <num> hit rate: %.2f%%, <unk> hit rate: %.2f%%' % (100*num_hit/total, 100*unk_hit/total))
-
-	# modified by sjyan @2017-10-25
-	logger.info('Saving essays to: ' + essays_path)
-	np.savetxt(essays_path, essays, fmt='%s')
-	logger.info('  total number of essays: %d' % len(essays))
-
 	return data_x, data_y, prompt_ids, maxlen_x
 
-def get_data(paths, prompt_id, vocab_size, maxlen, output_path, tokenize_text=True, to_lower=True, sort_by_len=False, vocab_path=None, score_index=6):
+def get_data(paths, prompt_id, vocab_size, maxlen, tokenize_text=True, to_lower=True, sort_by_len=False, vocab_path=None, score_index=6):
 	train_path, dev_path, test_path = paths[0], paths[1], paths[2]
-
+	
 	if not vocab_path:
 		vocab = create_vocab(train_path, prompt_id, maxlen, vocab_size, tokenize_text, to_lower)
 		if len(vocab) < vocab_size:
@@ -233,10 +205,9 @@ def get_data(paths, prompt_id, vocab_size, maxlen, output_path, tokenize_text=Tr
 			logger.warning('The vocabualry includes %i words which is different from given: %i' % (len(vocab), vocab_size))
 	logger.info('  Vocab size: %i' % (len(vocab)))
 	
-	# modified by sjyan @2017-10-25
-	train_x, train_y, train_prompts, train_maxlen = read_dataset(train_path, output_path, prompt_id, maxlen, vocab, tokenize_text, to_lower)
-	dev_x, dev_y, dev_prompts, dev_maxlen = read_dataset(dev_path, output_path, prompt_id, 0, vocab, tokenize_text, to_lower)
-	test_x, test_y, test_prompts, test_maxlen = read_dataset(test_path, output_path, prompt_id, 0, vocab, tokenize_text, to_lower)
+	train_x, train_y, train_prompts, train_maxlen = read_dataset(train_path, prompt_id, maxlen, vocab, tokenize_text, to_lower)
+	dev_x, dev_y, dev_prompts, dev_maxlen = read_dataset(dev_path, prompt_id, 0, vocab, tokenize_text, to_lower)
+	test_x, test_y, test_prompts, test_maxlen = read_dataset(test_path, prompt_id, 0, vocab, tokenize_text, to_lower)
 	
 	overal_maxlen = max(train_maxlen, dev_maxlen, test_maxlen)
 	

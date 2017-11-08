@@ -1,8 +1,4 @@
-# !/usr/bin/python
-# -*- coding:utf-8 -*-  
-# Author: Shengjia Yan
-# Date: 2017-10-19
-# Email: i@yanshengjia.com
+#!/usr/bin/env python
 
 import os
 import argparse
@@ -13,6 +9,7 @@ from time import time
 import sys
 import nea.utils as U
 import pickle as pk
+
 
 os.environ['KERAS_BACKEND']='theano'
 logger = logging.getLogger(__name__)
@@ -32,7 +29,7 @@ parser.add_argument("-u", "--rec-unit", dest="recurrent_unit", type=str, metavar
 parser.add_argument("-a", "--algorithm", dest="algorithm", type=str, metavar='<str>', default='rmsprop', help="Optimization algorithm (rmsprop|sgd|adagrad|adadelta|adam|adamax) (default=rmsprop)")
 parser.add_argument("-l", "--loss", dest="loss", type=str, metavar='<str>', default='mse', help="Loss function (mse|mae) (default=mse)")
 parser.add_argument("-e", "--embdim", dest="emb_dim", type=int, metavar='<int>', default=50, help="Embeddings dimension (default=50)")
-parser.add_argument("-c", "--cnndim", dest="cnn_dim", type=int, metavar='<int>', default=10, help="CNN output dimension. '0' means no CNN layer (default=0)")
+parser.add_argument("-c", "--cnndim", dest="cnn_dim", type=int, metavar='<int>', default=0, help="CNN output dimension. '0' means no CNN layer (default=0)")
 parser.add_argument("-w", "--cnnwin", dest="cnn_window_size", type=int, metavar='<int>', default=3, help="CNN window size. (default=3)")
 parser.add_argument("-r", "--rnndim", dest="rnn_dim", type=int, metavar='<int>', default=300, help="RNN dimension. '0' means no RNN layer (default=300)")
 parser.add_argument("-b", "--batch-size", dest="batch_size", type=int, metavar='<int>', default=32, help="Batch size (default=32)")
@@ -75,9 +72,8 @@ else:
 from keras.preprocessing import sequence
 
 # data_x is a list of lists
-# modified by sjyan @2017-10-25
 (train_x, train_y, train_pmt), (dev_x, dev_y, dev_pmt), (test_x, test_y, test_pmt), vocab, vocab_size, overal_maxlen, num_outputs = dataset.get_data(
-	(args.train_path, args.dev_path, args.test_path), args.prompt_id, args.vocab_size, args.maxlen, args.out_dir_path, tokenize_text=True, to_lower=True, sort_by_len=False, vocab_path=args.vocab_path)
+	(args.train_path, args.dev_path, args.test_path), args.prompt_id, args.vocab_size, args.maxlen, tokenize_text=True, to_lower=True, sort_by_len=False, vocab_path=args.vocab_path)
 
 # Dump vocab
 with open(out_dir + '/vocab.pkl', 'wb') as vocab_file:
@@ -135,7 +131,6 @@ logger.info('  test_y shape:  ' + str(test_y.shape))
 logger.info('  train_y mean: %s, stdev: %s, MFC: %s' % (str(train_mean), str(train_std), str(mfs_list)))
 
 # We need the dev and test sets in the original scale for evaluation
-train_y_org = train_y.astype(dataset.get_ref_dtype())
 dev_y_org = dev_y.astype(dataset.get_ref_dtype())
 test_y_org = test_y.astype(dataset.get_ref_dtype())
 
@@ -172,9 +167,9 @@ model.compile(loss=loss, optimizer=optimizer, metrics=[metric])
 ## Plotting model
 #
 
-from keras.utils.visualize_util import plot
+#from keras.utils.visualize_util import plot
 
-plot(model, to_file = out_dir + '/model.png')
+#plot(model, to_file = out_dir + '/model.png')
 
 ###############################################################################################################################
 ## Save model architecture
@@ -184,12 +179,12 @@ logger.info('Saving model architecture')
 with open(out_dir + '/model_arch.json', 'w') as arch:
 	arch.write(model.to_json(indent=2))
 logger.info('  Done')
-
+	
 ###############################################################################################################################
 ## Evaluator
 #
 
-evl = Evaluator(dataset, args.prompt_id, out_dir, dev_x, test_x, dev_y, test_y, train_y_org, dev_y_org, test_y_org)
+evl = Evaluator(dataset, args.prompt_id, out_dir, dev_x, test_x, dev_y, test_y, dev_y_org, test_y_org)
 
 ###############################################################################################################################
 ## Training
@@ -197,14 +192,16 @@ evl = Evaluator(dataset, args.prompt_id, out_dir, dev_x, test_x, dev_y, test_y, 
 
 logger.info('--------------------------------------------------------------------------------------------------------------------------')
 logger.info('Initial Evaluation:')
-evl.evaluate(model, -1, print_info=True)
+#evl.evaluate(model, -1, print_info=True)
 
 total_train_time = 0
 total_eval_time = 0
 
+
 for ii in range(args.epochs):
 	# Training
 	t0 = time()
+
 	train_history = model.fit(train_x, train_y, batch_size=args.batch_size, nb_epoch=1, verbose=0)
 	tr_time = time() - t0
 	total_train_time += tr_time

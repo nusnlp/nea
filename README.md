@@ -1,4 +1,4 @@
-# Neural Essay Assessor 1.0 #
+# Neural Essay Assessor 2.0 #
 
 An automatic essay scoring system based on convolutional and recurrent neural networks, including GRU and LSTM.
 
@@ -10,11 +10,10 @@ An automatic essay scoring system based on convolutional and recurrent neural ne
 
 ### Environment
 
-- Keras 1.1.0
-- Theano 0.8.2
+- Keras 2.0.8
+- Theano 0.9.0
+- Tensorflow 1.3.0
 - Python 2.7.9
-- Numpy 1.13.3
-- Scipy 0.19.1
 
 ### Data ###
 
@@ -55,7 +54,6 @@ Neural Essay Assessor is licensed under the GNU General Public License Version 3
 
 * Kaveh Taghipour (kaveh@comp.nus.edu.sg)
 * Hwee Tou Ng (nght@comp.nus.edu.sg)
-* Shengjia Yan (i@yanshengjia.com)
 
 ### Publication ###
 
