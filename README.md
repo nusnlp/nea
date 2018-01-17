@@ -2,6 +2,16 @@
 
 An automatic essay scoring system based on convolutional and recurrent neural networks, including GRU and LSTM.
 
+Compatible with Keras 2.
+
+## Environment
+
+* Keras 2.0.8
+* Theano 0.9.0
+* Numpy 1.13.3
+* Scipy 1.0.0
+* Python 2.7.9
+
 ### Set Up ###
 
 * Install Keras (with Theano backend)
