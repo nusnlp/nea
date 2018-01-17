@@ -2,8 +2,6 @@
 
 An automatic essay scoring system based on convolutional and recurrent neural networks, including GRU and LSTM.
 
-Compatible with Keras 2.
-
 ## Environment
 
 * Keras 2.0.8
