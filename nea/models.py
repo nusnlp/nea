@@ -49,7 +49,7 @@ def create_model(args, initial_mean_value, overal_maxlen, vocab):
 		model.add(Dense(num_outputs))
 		if not args.skip_init_bias:
 			bias_value = (np.log(initial_mean_value) - np.log(1 - initial_mean_value)).astype(K.floatx())
-			model.layers[-1].b.set_value(bias_value)
+			model.layers[-1].bias = bias_value
 		model.add(Activation('sigmoid'))
 		model.emb_index = 0
 	
@@ -70,10 +70,10 @@ def create_model(args, initial_mean_value, overal_maxlen, vocab):
 		model.add(Dense(num_outputs))
 		if not args.skip_init_bias:
 			bias_value = (np.log(initial_mean_value) - np.log(1 - initial_mean_value)).astype(K.floatx())
-			model.layers[-1].b.set_value(bias_value)
+			model.layers[-1].bias = bias_value
 		model.add(Activation('sigmoid'))
 		model.emb_index = 0
-	
+
 	elif args.model_type == 'breg':
 		logger.info('Building a BIDIRECTIONAL REGRESSION model')
 		from keras.layers import Dense, Dropout, Embedding, LSTM, Input, merge
@@ -130,7 +130,7 @@ def create_model(args, initial_mean_value, overal_maxlen, vocab):
 		from w2vEmbReader import W2VEmbReader as EmbReader
 		logger.info('Initializing lookup table')
 		emb_reader = EmbReader(args.emb_path, emb_dim=args.emb_dim)
-		model.layers[model.emb_index].W.set_value(emb_reader.get_emb_matrix_given_vocab(vocab, model.layers[model.emb_index].W.get_value()))
+		model.layers[model.emb_index].set_weights(emb_reader.get_emb_matrix_given_vocab(vocab, model.layers[model.emb_index].get_weights()))
 		logger.info('  Done')
 	
 	return model
